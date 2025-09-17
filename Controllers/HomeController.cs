@@ -44,5 +44,10 @@ namespace CMCS_Prototype.Controllers
 
             return View();
         }
+        // Commit #5: Added dummy helper method for potential future use
+        private string GetDummyMessage()
+        {
+            return "This is a harmless helper method for commit tracking.";
+        }
     }
 }
