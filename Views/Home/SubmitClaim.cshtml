@@ -1,0 +1,16 @@
+﻿<h2>Submit Claim (Dummy)</h2>
+
+<form method="post">
+    <label>Claim Amount:</label>
+    <input type="text" name="dummyInput" />
+    <button type="submit">Submit</button>
+</form>
+
+@if (ViewBag.Message != null)
+{
+    <p style="color:green">@ViewBag.Message</p>
+}
+
+<br />
+<a href="/Home/Index">Back to Dashboard</a>
+

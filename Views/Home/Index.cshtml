@@ -1,0 +1,66 @@
+﻿@{
+    ViewData["Title"] = "Contract Monthly Claim System Prototype";
+}
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+
+<div class="container mt-5">
+    <h1 class="text-center mb-5">@ViewData["Title"]</h1>
+
+    <div class="row g-4">
+        <!-- Lecturer Info -->
+        <div class="col-md-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-primary text-white d-flex align-items-center">
+                    <i class="bi bi-person-fill me-2"></i> Lecturer Information
+                </div>
+                <div class="card-body">
+                    <p><strong>Name:</strong> @((ViewData["Lecturer"] as CMCS_Prototype.Models.Lecturer)?.Name)</p>
+                    <p><strong>Email:</strong> @((ViewData["Lecturer"] as CMCS_Prototype.Models.Lecturer)?.Email)</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Claim Info -->
+        <div class="col-md-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-success text-white d-flex align-items-center">
+                    <i class="bi bi-file-earmark-text-fill me-2"></i> Claim Details
+                </div>
+                <div class="card-body">
+                    <p><strong>Claim ID:</strong> @((ViewData["Claim"] as CMCS_Prototype.Models.Claim)?.ClaimId)</p>
+                    <p><strong>Amount:</strong> @((ViewData["Claim"] as CMCS_Prototype.Models.Claim)?.Amount)</p>
+                    <p><strong>Date Submitted:</strong> @((ViewData["Claim"] as CMCS_Prototype.Models.Claim)?.DateSubmitted)</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Approval Info -->
+        <div class="col-md-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-warning text-dark d-flex align-items-center">
+                    <i class="bi bi-check-circle-fill me-2"></i> Approval Status
+                </div>
+                <div class="card-body">
+                    <p><strong>Approval ID:</strong> @((ViewData["Approval"] as CMCS_Prototype.Models.ClaimApproval)?.ApprovalId)</p>
+                    <p><strong>Approved:</strong> @((ViewData["Approval"] as CMCS_Prototype.Models.ClaimApproval)?.Approved)</p>
+                    <p><strong>Approver:</strong> @((ViewData["Approval"] as CMCS_Prototype.Models.ClaimApproval)?.ApproverName)</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Submit Button -->
+    <div class="text-center mt-5">
+        <a href="#" class="btn btn-primary btn-lg shadow-sm">
+            <i class="bi bi-plus-circle me-2"></i> Submit New Claim
+        </a>
+    </div>
+
+    <!-- Footer -->
+    <footer class="text-center mt-5 mb-3 text-muted">
+        &copy; 2025 - CMCS_Prototype
+    </footer>
+</div>
