@@ -35,6 +35,9 @@ namespace CMCS_Prototype.Controllers
             };
 
             // Pass data to view
+            // Commit #3: Added a dummy note for display
+            ViewData["Note"] = "This is a dummy note for testing purposes";
+
             ViewData["Lecturer"] = lecturer;
             ViewData["Claim"] = claim;
             ViewData["Approval"] = approval;
