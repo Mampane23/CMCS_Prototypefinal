@@ -1,0 +1,72 @@
+@model CMCS.Models.Claim
+@{
+    ViewData["Title"] = "Submit Claim";
+}
+
+<h2>Submit Your Monthly Claim</h2>
+
+<form asp-action="SubmitClaim" method="post" enctype="multipart/form-data">
+    <div class="mb-3">
+        <label asp-for="LecturerName" class="form-label"></label>
+        <input asp-for="LecturerName" class="form-control" />
+        <span asp-validation-for="LecturerName" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="HoursWorked" class="form-label"></label>
+        <input asp-for="HoursWorked" class="form-control" type="number" step="0.01"/>
+        <span asp-validation-for="HoursWorked" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="HourlyRate" class="form-label"></label>
+        <input asp-for="HourlyRate" class="form-control" type="number" step="0.01"/>
+        <span asp-validation-for="HourlyRate" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label>Total Amount (R)</label>
+        <input value="@(Model?.TotalAmount.ToString("F2") ?? "0.00")" class="form-control" readonly />
+    </div>
+
+    <div class="mb-3">
+        <label>Upload Supporting Document</label>
+        <input type="file" name="uploadedFile" class="form-control" accept=".pdf,.docx,.xlsx" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Submit</button>
+</form>
+
+<!-- Toast Notification -->
+@if (TempData["Success"] != null)
+{
+    <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+        <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-header bg-success text-white">
+                <strong class="me-auto">Success</strong>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body">
+                @TempData["Success"]
+            </div>
+        </div>
+    </div>
+}
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    
+    @if (TempData["Success"] != null)
+    {
+        <script>
+            // Auto-hide toast after 3 seconds
+            setTimeout(function() {
+                var toastElement = document.querySelector('.toast');
+                if (toastElement) {
+                    var toast = new bootstrap.Toast(toastElement);
+                    toast.hide();
+                }
+            }, 3000);
+        </script>
+    }
+}

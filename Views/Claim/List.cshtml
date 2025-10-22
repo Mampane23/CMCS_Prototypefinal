@@ -1,0 +1,41 @@
+@model IEnumerable<CMCS.Models.Claim>
+
+@{
+    ViewData["Title"] = "Claims List";
+}
+
+<h2>Claims List</h2>
+
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>Lecturer Name</th>
+            <th>Hours Worked</th>
+            <th>Hourly Rate (R)</th>
+            <th>Total Amount (R)</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var claim in Model)
+    {
+        <tr>
+            <td>@claim.LecturerName</td>
+            <td>@claim.HoursWorked</td>
+            <td>@claim.HourlyRate.ToString("F2")</td>
+            <td>@claim.TotalAmount.ToString("F2")</td>
+            <td>@claim.Status</td>
+            <td>
+                @if (claim.Status == "Pending")
+                {
+                    <a asp-action="Approve" asp-route-id="@claim.Id" class="btn btn-success btn-sm">Approve</a>
+                    <a asp-action="Reject" asp-route-id="@claim.Id" class="btn btn-danger btn-sm">Reject</a>
+                }
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>
+
+<a asp-action="Index" class="btn btn-primary mt-3">Submit New Claim</a>

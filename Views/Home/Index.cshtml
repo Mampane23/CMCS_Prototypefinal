@@ -1,0 +1,13 @@
+@{
+    ViewData["Title"] = "Home";
+}
+
+<div class="text-center mt-5">
+    <h1 class="display-4">Contract Monthly Claim System</h1>
+    <p class="lead">Manage lecturer claims efficiently</p>
+    
+    <div class="mt-4">
+        <a asp-controller="Claim" asp-action="SubmitClaim" class="btn btn-primary btn-lg">Submit New Claim</a>
+        <a asp-controller="Claim" asp-action="List" class="btn btn-outline-primary btn-lg">View All Claims</a>
+    </div>
+</div>

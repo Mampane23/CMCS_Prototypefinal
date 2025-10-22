@@ -1,0 +1,49 @@
+﻿@model CMCS.Models.Claim
+@{
+    ViewData["Title"] = "Submit Claim";
+}
+
+<h2>Submit Your Monthly Claim</h2>
+<form asp-action="SubmitClaim" method="post" enctype="multipart/form-data">
+    <div class="mb-3">
+        <label asp-for="LecturerName" class="form-label"></label>
+        <input asp-for="LecturerName" class="form-control" />
+        <span asp-validation-for="LecturerName" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="HoursWorked" class="form-label"></label>
+        <input asp-for="HoursWorked" type="number" class="form-control" step="0.01"/>
+        <span asp-validation-for="HoursWorked" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="HourlyRate" class="form-label"></label>
+        <input asp-for="HourlyRate" type="number" class="form-control" step="0.01"/>
+        <span asp-validation-for="HourlyRate" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label>Total Amount (R)</label>
+        <input value="@(Model?.TotalAmount.ToString("F2") ?? "0.00")" class="form-control" readonly />
+    </div>
+
+    <div class="mb-3">
+        <label>Upload Supporting Document</label>
+        <input type="file" name="uploadedFile" class="form-control" accept=".pdf,.docx,.xlsx" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Submit Claim</button>
+</form>
+<a asp-action="List" class="btn btn-secondary mb-3">View Claims</a>
+
+@if (ViewBag.Message != null)
+{
+    <div class="alert alert-success mt-3">
+        @ViewBag.Message
+    </div>
+}
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

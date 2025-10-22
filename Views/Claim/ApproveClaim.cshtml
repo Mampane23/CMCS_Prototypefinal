@@ -1,0 +1,30 @@
+@model CMCS.Models.Claim
+
+@{
+    ViewData["Title"] = "Approve or Reject Claim";
+}
+
+<h2>Approve or Reject Claim</h2>
+
+<div class="card p-4 shadow-sm">
+    <h4>@Model.LecturerName</h4>
+    <p><strong>Hours Worked:</strong> @Model.HoursWorked</p>
+    <p><strong>Hourly Rate:</strong> @Model.HourlyRate</p>
+    <p><strong>Status:</strong> 
+        <span class="badge @(Model.Status == "Approved" ? "bg-success" : Model.Status == "Rejected" ? "bg-danger" : "bg-warning text-dark")">
+            @Model.Status
+        </span>
+    </p>
+
+    <div class="mt-3 d-flex gap-2">
+        <form asp-action="Approve" asp-route-id="@Model.Id" method="post">
+            <button type="submit" class="btn btn-success">Approve</button>
+        </form>
+
+        <form asp-action="Reject" asp-route-id="@Model.Id" method="post">
+            <button type="submit" class="btn btn-danger">Reject</button>
+        </form>
+
+        <a asp-action="Index" class="btn btn-secondary">Back</a>
+    </div>
+</div>
