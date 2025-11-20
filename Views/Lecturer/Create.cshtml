@@ -1,0 +1,175 @@
+@model CMCS.Models.Claim
+
+@{
+    ViewData["Title"] = "Submit New Claim";
+}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0"><i class="bi bi-file-earmark-plus"></i> Submit New Claim</h4>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Create" method="post" enctype="multipart/form-data" id="claimForm">
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="LecturerName" class="form-label"></label>
+                                <input asp-for="LecturerName" class="form-control" placeholder="Enter your full name" />
+                                <span asp-validation-for="LecturerName" class="text-danger"></span>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="LecturerEmail" class="form-label"></label>
+                                <input asp-for="LecturerEmail" class="form-control" type="email" placeholder="your.email@university.ac.za" />
+                                <span asp-validation-for="LecturerEmail" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Department" class="form-label"></label>
+                                <input asp-for="Department" class="form-control" placeholder="e.g., Computer Science" />
+                                <span asp-validation-for="Department" class="text-danger"></span>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="ModuleCode" class="form-label"></label>
+                                <input asp-for="ModuleCode" class="form-control" placeholder="e.g., PROG6212" />
+                                <span asp-validation-for="ModuleCode" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="ClaimMonth" class="form-label"></label>
+                                <input asp-for="ClaimMonth" class="form-control" type="month" />
+                                <span asp-validation-for="ClaimMonth" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="HoursWorked" class="form-label"></label>
+                                <input asp-for="HoursWorked" class="form-control" id="hoursWorked" type="number" step="0.01" min="1" max="744" placeholder="Enter hours worked" />
+                                <span asp-validation-for="HoursWorked" class="text-danger"></span>
+                                <small class="text-muted">Maximum 744 hours per month</small>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="HourlyRate" class="form-label"></label>
+                                <input asp-for="HourlyRate" class="form-control" id="hourlyRate" type="number" step="0.01" min="50" max="1000" placeholder="Enter hourly rate" />
+                                <span asp-validation-for="HourlyRate" class="text-danger"></span>
+                                <small class="text-muted">Range: R50 - R1000</small>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Total Amount (Auto-calculated)</label>
+                            <div class="input-group">
+                                <span class="input-group-text">R</span>
+                                <input type="text" class="form-control form-control-lg" id="totalAmount" readonly style="font-size: 1.5rem; font-weight: bold; background-color: #e9ecef;" value="0.00" />
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="uploadedFile" class="form-label">Supporting Documents (Optional)</label>
+                            <input type="file" class="form-control" id="uploadedFile" name="uploadedFile" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" />
+                            <small class="text-muted">Accepted formats: PDF, Word, Images (Max 5MB)</small>
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a asp-action="Index" class="btn btn-secondary">
+                                <i class="bi bi-x-circle"></i> Cancel
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-send"></i> Submit Claim
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    
+    <script>
+        $(document).ready(function() {
+            // Auto-calculation of total amount
+            function calculateTotal() {
+                var hours = parseFloat($('#hoursWorked').val()) || 0;
+                var rate = parseFloat($('#hourlyRate').val()) || 0;
+                var total = hours * rate;
+                
+                $('#totalAmount').val(total.toFixed(2));
+                
+                // Visual feedback
+                if (total > 0) {
+                    $('#totalAmount').css('color', '#28a745');
+                } else {
+                    $('#totalAmount').css('color', '#333');
+                }
+            }
+
+            // Trigger calculation on input
+            $('#hoursWorked, #hourlyRate').on('input', calculateTotal);
+
+            // Client-side validation
+            $('#claimForm').on('submit', function(e) {
+                var hours = parseFloat($('#hoursWorked').val());
+                var rate = parseFloat($('#hourlyRate').val());
+                var isValid = true;
+
+                // Clear previous errors
+                $('.validation-error').remove();
+
+                // Validate hours
+                if (isNaN(hours) || hours <= 0) {
+                    $('#hoursWorked').after('<span class="text-danger validation-error"><br>Hours worked must be greater than 0</span>');
+                    isValid = false;
+                } else if (hours > 744) {
+                    $('#hoursWorked').after('<span class="text-danger validation-error"><br>Hours cannot exceed 744 per month</span>');
+                    isValid = false;
+                }
+
+                // Validate rate
+                if (isNaN(rate) || rate < 50) {
+                    $('#hourlyRate').after('<span class="text-danger validation-error"><br>Hourly rate must be at least R50</span>');
+                    isValid = false;
+                } else if (rate > 1000) {
+                    $('#hourlyRate').after('<span class="text-danger validation-error"><br>Hourly rate cannot exceed R1000</span>');
+                    isValid = false;
+                }
+
+                // Validate total amount
+                var total = hours * rate;
+                if (total > 500000) {
+                    alert('Total amount exceeds maximum allowed (R500,000)');
+                    isValid = false;
+                }
+
+                if (!isValid) {
+                    e.preventDefault();
+                }
+            });
+
+            // File size validation
+            $('#uploadedFile').on('change', function() {
+                var fileSize = this.files[0]?.size || 0;
+                var maxSize = 5 * 1024 * 1024; // 5MB
+
+                if (fileSize > maxSize) {
+                    alert('File size exceeds 5MB limit');
+                    $(this).val('');
+                }
+            });
+        });
+    </script>
+}

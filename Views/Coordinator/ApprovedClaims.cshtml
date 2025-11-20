@@ -1,0 +1,67 @@
+@model IEnumerable<CMCS.Models.Claim>
+@{
+    ViewData["Title"] = "Approved Claims";
+}
+
+<div class="container-fluid mt-4">
+    <div class="row mb-4">
+        <div class="col">
+            <h2><i class="bi bi-check-circle"></i> Approved Claims</h2>
+            <p class="text-muted">View all approved claims</p>
+        </div>
+        <div class="col-auto">
+            <a class="btn btn-success" asp-action="ExportToCSV" asp-route-status="Approved">
+                <i class="bi bi-file-earmark-spreadsheet"></i> Export to CSV
+            </a>
+        </div>
+    </div>
+
+    @if (Model.Any())
+    {
+        <div class="card shadow">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Claim ID</th>
+                                <th>Lecturer Name</th>
+                                <th>Department</th>
+                                <th>Total Amount</th>
+                                <th>Submitted</th>
+                                <th>Reviewed By</th>
+                                <th>Review Date</th>
+                                <th>Comments</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var claim in Model)
+                            {
+                                <tr>
+                                    <td><strong>#@claim.Id</strong></td>
+                                    <td>@claim.LecturerName</td>
+                                    <td>@(claim.Department ?? "N/A")</td>
+                                    <td><strong>R @claim.TotalAmount.ToString("N2")</strong></td>
+                                    <td>@claim.SubmissionDate.ToString("dd MMM yyyy")</td>
+                                    <td>@(claim.ReviewedBy ?? "N/A")</td>
+                                    <td>@(claim.ReviewedDate?.ToString("dd MMM yyyy") ?? "N/A")</td>
+                                    <td>@(claim.Comments ?? "-")</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-info">
+            <i class="bi bi-info-circle"></i> No approved claims yet.
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+}

@@ -1,0 +1,82 @@
+@model IEnumerable<CMCS.Models.Claim>
+
+@{
+    ViewData["Title"] = "Approved Claims";
+}
+
+<div class="container-fluid mt-4">
+    <div class="row mb-4">
+        <div class="col">
+            <h2><i class="bi bi-check-circle"></i> Approved Claims</h2>
+            <p class="text-muted">Process payments for approved claims</p>
+        </div>
+        <div class="col-auto">
+            <a class="btn btn-success" asp-action="ExportToCSV" asp-route-status="Approved">
+                <i class="bi bi-file-earmark-spreadsheet"></i> Export to CSV
+            </a>
+        </div>
+    </div>
+
+    @if (ViewBag.TotalPayable != null)
+    {
+        <div class="alert alert-success">
+            <h5><strong>Total Payable:</strong> R @ViewBag.TotalPayable.ToString("N2")</h5>
+        </div>
+    }
+
+    @if (Model != null && Model.Any())
+    {
+        <div class="card shadow">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Claim ID</th>
+                                <th>Lecturer Name</th>
+                                <th>Department</th>
+                                <th>Total Amount</th>
+                                <th>Submitted</th>
+                                <th>Reviewed By</th>
+                                <th>Review Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td><strong>#@item.Id</strong></td>
+                                    <td>@item.LecturerName</td>
+                                    <td>@(item.Department ?? "N/A")</td>
+                                    <td><strong>R @item.TotalAmount.ToString("N2")</strong></td>
+                                    <td>@item.SubmissionDate.ToString("dd MMM yyyy")</td>
+                                    <td>@(item.ReviewedBy ?? "N/A")</td>
+                                    <td>@(item.ReviewedDate?.ToString("dd MMM yyyy") ?? "N/A")</td>
+                                    <td>
+                                        <a asp-action="GenerateInvoice" asp-route-id="@item.Id" class="btn btn-sm btn-primary">
+                                            <i class="bi bi-receipt"></i> Invoice
+                                        </a>
+                                        <a asp-action="ProcessPayment" asp-route-id="@item.Id" class="btn btn-sm btn-success">
+                                            <i class="bi bi-cash"></i> Process
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-info">
+            <i class="bi bi-info-circle"></i> No approved claims yet.
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+}

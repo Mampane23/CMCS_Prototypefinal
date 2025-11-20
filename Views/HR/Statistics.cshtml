@@ -1,0 +1,41 @@
+@{
+    ViewData["Title"] = "HR Statistics";
+}
+
+<h2>HR Statistics</h2>
+
+<p>This page will show claim statistics and relevant analytics.</p>
+
+<div class="row">
+    <div class="col-md-3">
+        <div class="card p-3">
+            <h4>Total Claims</h4>
+            <p>@ViewBag.TotalClaims</p>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card p-3">
+            <h4>Approved Claims</h4>
+            <p>@ViewBag.ApprovedClaims</p>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card p-3">
+            <h4>Total Payable</h4>
+            <p>R @ViewBag.TotalPayable</p>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card p-3">
+            <h4>Pending Payment</h4>
+            <p>@ViewBag.PendingPayment</p>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<p class="text-muted">More detailed graphs and insights can be added later.</p>

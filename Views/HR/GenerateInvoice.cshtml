@@ -1,0 +1,215 @@
+@model CMCS.Models.Claim
+
+@{
+    ViewData["Title"] = "Invoice";
+    Layout = null; // No layout for printing
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Invoice - Claim #@Model.Id</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <style>
+        @@media print {
+            .no-print {
+                display: none;
+            }
+        }
+        
+        .invoice-box {
+            max-width: 800px;
+            margin: auto;
+            padding: 30px;
+            border: 1px solid #eee;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
+            font-size: 16px;
+            line-height: 24px;
+            color: #555;
+        }
+        
+        .invoice-header {
+            border-bottom: 3px solid #0d6efd;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .company-info {
+            text-align: right;
+        }
+        
+        .invoice-title {
+            font-size: 36px;
+            font-weight: bold;
+            color: #0d6efd;
+        }
+        
+        .info-table {
+            width: 100%;
+            margin-bottom: 30px;
+        }
+        
+        .info-table td {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .info-label {
+            font-weight: bold;
+            width: 200px;
+            color: #333;
+        }
+        
+        .amount-section {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 5px;
+            margin-top: 30px;
+        }
+        
+        .total-amount {
+            font-size: 32px;
+            font-weight: bold;
+            color: #198754;
+        }
+        
+        .footer-note {
+            margin-top: 50px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            font-size: 12px;
+            color: #999;
+        }
+    </style>
+</head>
+<body>
+    <div class="invoice-box">
+        <!-- Header -->
+        <div class="invoice-header">
+            <div class="row">
+                <div class="col-6">
+                    <h1 class="invoice-title">INVOICE</h1>
+                    <p class="mb-0"><strong>Invoice #:</strong> INV-@Model.Id-@DateTime.Now.Year</p>
+                    <p><strong>Date:</strong> @DateTime.Now.ToString("dd MMMM yyyy")</p>
+                </div>
+                <div class="col-6 company-info">
+                    <h4><strong>University Name</strong></h4>
+                    <p class="mb-0">123 University Avenue</p>
+                    <p class="mb-0">Johannesburg, 2000</p>
+                    <p class="mb-0">South Africa</p>
+                    <p class="mb-0">Tel: (011) 123-4567</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bill To Section -->
+        <div class="row mb-4">
+            <div class="col-6">
+                <h5><strong>BILL TO:</strong></h5>
+                <p class="mb-1"><strong>@Model.LecturerName</strong></p>
+                <p class="mb-1">@(Model.Department ?? "N/A")</p>
+                <p class="mb-1">@(Model.LecturerEmail ?? "N/A")</p>
+            </div>
+            <div class="col-6">
+                <h5><strong>CLAIM DETAILS:</strong></h5>
+                <p class="mb-1"><strong>Claim ID:</strong> #@Model.Id</p>
+                <p class="mb-1"><strong>Module Code:</strong> @(Model.ModuleCode ?? "N/A")</p>
+                <p class="mb-1"><strong>Claim Month:</strong> @(Model.ClaimMonth ?? "N/A")</p>
+                <p class="mb-1"><strong>Status:</strong> <span class="badge bg-success">@Model.Status</span></p>
+            </div>
+        </div>
+
+        <!-- Service Details Table -->
+        <h5><strong>SERVICE DETAILS:</strong></h5>
+        <table class="table table-bordered">
+            <thead class="table-light">
+                <tr>
+                    <th>Description</th>
+                    <th class="text-center">Hours Worked</th>
+                    <th class="text-end">Rate per Hour</th>
+                    <th class="text-end">Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        <strong>Lecturing Services</strong><br>
+                        <small>Module: @(Model.ModuleCode ?? "N/A")</small><br>
+                        <small>Period: @(Model.ClaimMonth ?? "N/A")</small>
+                    </td>
+                    <td class="text-center">@Model.HoursWorked hrs</td>
+                    <td class="text-end">R @Model.HourlyRate.ToString("N2")</td>
+                    <td class="text-end"><strong>R @Model.TotalAmount.ToString("N2")</strong></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- Amount Section -->
+        <div class="amount-section">
+            <div class="row">
+                <div class="col-8">
+                    <h5><strong>TOTAL AMOUNT DUE:</strong></h5>
+                </div>
+                <div class="col-4 text-end">
+                    <div class="total-amount">R @Model.TotalAmount.ToString("N2")</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Approval Information -->
+        <div class="mt-4">
+            <h5><strong>APPROVAL INFORMATION:</strong></h5>
+            <table class="info-table">
+                <tr>
+                    <td class="info-label">Submission Date:</td>
+                    <td>@Model.SubmissionDate.ToString("dd MMMM yyyy")</td>
+                </tr>
+                <tr>
+                    <td class="info-label">Approved By:</td>
+                    <td>@(Model.ReviewedBy ?? "N/A")</td>
+                </tr>
+                <tr>
+                    <td class="info-label">Approval Date:</td>
+                    <td>@(Model.ReviewedDate?.ToString("dd MMMM yyyy") ?? "N/A")</td>
+                </tr>
+                @if (!string.IsNullOrEmpty(Model.Comments))
+                {
+                    <tr>
+                        <td class="info-label">Comments:</td>
+                        <td>@Model.Comments</td>
+                    </tr>
+                }
+            </table>
+        </div>
+
+        <!-- Supporting Documents -->
+        @if (!string.IsNullOrEmpty(Model.UploadedFiles))
+        {
+            <div class="alert alert-info mt-3">
+                <strong><i class="bi bi-paperclip"></i> Supporting Documents Attached:</strong> @Model.UploadedFiles
+            </div>
+        }
+
+        <!-- Footer -->
+        <div class="footer-note">
+            <p><strong>Payment Terms:</strong> Payment is due within 30 days of invoice date.</p>
+            <p><strong>Note:</strong> This is a computer-generated invoice. No signature is required.</p>
+            <p class="mb-0">Thank you for your service to the university.</p>
+        </div>
+
+        <!-- Action Buttons (no-print) -->
+        <div class="mt-4 text-center no-print">
+            <button onclick="window.print()" class="btn btn-primary btn-lg">
+                <i class="bi bi-printer"></i> Print Invoice
+            </button>
+            <a asp-action="ApprovedClaims" class="btn btn-secondary btn-lg">
+                <i class="bi bi-arrow-left"></i> Back to Approved Claims
+            </a>
+        </div>
+    </div>
+
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,255 @@
+@model IEnumerable<CMCS.Models.Claim>
+
+@{
+    ViewData["Title"] = "Coordinator Dashboard";
+}
+
+<div class="container-fluid mt-4">
+    <div class="row mb-4">
+        <div class="col">
+            <h2><i class="bi bi-briefcase"></i> Programme Coordinator Dashboard</h2>
+            <p class="text-muted">Review and approve lecturer claims</p>
+        </div>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="bi bi-check-circle"></i> @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-triangle"></i> @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <!-- Statistics Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-info text-white shadow">
+                <div class="card-body">
+                    <h5 class="card-title">Total Claims</h5>
+                    <h2 class="display-4">@ViewBag.TotalClaims</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-white shadow">
+                <div class="card-body">
+                    <h5 class="card-title">Pending Review</h5>
+                    <h2 class="display-4">@ViewBag.PendingClaims</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white shadow">
+                <div class="card-body">
+                    <h5 class="card-title">Approved</h5>
+                    <h2 class="display-4">@ViewBag.ApprovedClaims</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-danger text-white shadow">
+                <div class="card-body">
+                    <h5 class="card-title">Rejected</h5>
+                    <h2 class="display-4">@ViewBag.RejectedClaims</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row mb-4">
+        <div class="col">
+            <div class="card shadow">
+                <div class="card-body">
+                    <h5 class="card-title">Quick Actions</h5>
+                    <div class="d-grid gap-2 d-md-flex">
+                        <a asp-action="PendingClaims" class="btn btn-warning btn-lg">
+                            <i class="bi bi-clock-history"></i> Review Pending Claims (@ViewBag.PendingClaims)
+                        </a>
+                        <a asp-action="ApprovedClaims" class="btn btn-success btn-lg">
+                            <i class="bi bi-check-circle"></i> View Approved Claims
+                        </a>
+                        <a asp-action="RejectedClaims" class="btn btn-danger btn-lg">
+                            <i class="bi bi-x-circle"></i> View Rejected Claims
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Claims -->
+    <div class="card shadow">
+        <div class="card-header bg-light">
+            <h5 class="mb-0">Recent Claims</h5>
+        </div>
+        <div class="card-body">
+            @if (Model.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Claim ID</th>
+                                <th>Lecturer</th>
+                                <th>Department</th>
+                                <th>Hours</th>
+                                <th>Rate</th>
+                                <th>Total Amount</th>
+                                <th>Status</th>
+                                <th>Submitted</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.Take(10))
+                            {
+                                <tr>
+                                    <td><strong>#@item.Id</strong></td>
+                                    <td>@item.LecturerName</td>
+                                    <td>@(item.Department ?? "N/A")</td>
+                                    <td>@item.HoursWorked hrs</td>
+                                    <td>R @item.HourlyRate.ToString("N2")</td>
+                                    <td><strong>R @item.TotalAmount.ToString("N2")</strong></td>
+                                    <td>
+                                        @if (item.Status == "Pending")
+                                        {
+                                            <span class="badge bg-warning text-dark">Pending</span>
+                                        }
+                                        else if (item.Status == "Approved")
+                                        {
+                                            <span class="badge bg-success">Approved</span>
+                                        }
+                                        else if (item.Status == "Rejected")
+                                        {
+                                            <span class="badge bg-danger">Rejected</span>
+                                        }
+                                    </td>
+                                    <td>@item.SubmissionDate.ToString("dd MMM yyyy")</td>
+                                    <td>
+                                        @if (item.Status == "Pending")
+                                        {
+                                            <a asp-action="Review" asp-route-id="@item.Id" class="btn btn-sm btn-primary">
+                                                <i class="bi bi-clipboard-check"></i> Review
+                                            </a>
+                                        }
+                                        else
+                                        {
+                                            <button type="button" class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#detailsModal@(item.Id)">
+                                                <i class="bi bi-eye"></i> View
+                                            </button>
+                                        }
+                                    </td>
+                                </tr>
+
+                                <!-- Details Modal -->
+                                <div class="modal fade" id="detailsModal@(item.Id)" tabindex="-1">
+                                    <div class="modal-dialog modal-lg">
+                                        <div class="modal-content">
+                                            <div class="modal-header @(item.Status == "Approved" ? "bg-success" : item.Status == "Rejected" ? "bg-danger" : "bg-warning") text-white">
+                                                <h5 class="modal-title">Claim #@item.Id - @item.Status</h5>
+                                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <div class="row mb-3">
+                                                    <div class="col-md-6">
+                                                        <strong>Lecturer Name:</strong>
+                                                        <p>@item.LecturerName</p>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <strong>Email:</strong>
+                                                        <p>@(item.LecturerEmail ?? "Not provided")</p>
+                                                    </div>
+                                                </div>
+                                                <div class="row mb-3">
+                                                    <div class="col-md-6">
+                                                        <strong>Department:</strong>
+                                                        <p>@(item.Department ?? "Not specified")</p>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <strong>Module Code:</strong>
+                                                        <p>@(item.ModuleCode ?? "Not specified")</p>
+                                                    </div>
+                                                </div>
+                                                <div class="row mb-3">
+                                                    <div class="col-md-4">
+                                                        <strong>Hours Worked:</strong>
+                                                        <p class="text-primary h5">@item.HoursWorked hrs</p>
+                                                    </div>
+                                                    <div class="col-md-4">
+                                                        <strong>Hourly Rate:</strong>
+                                                        <p class="text-primary h5">R @item.HourlyRate.ToString("N2")</p>
+                                                    </div>
+                                                    <div class="col-md-4">
+                                                        <strong>Total Amount:</strong>
+                                                        <p class="text-success h4">R @item.TotalAmount.ToString("N2")</p>
+                                                    </div>
+                                                </div>
+                                                <div class="row mb-3">
+                                                    <div class="col-md-6">
+                                                        <strong>Claim Month:</strong>
+                                                        <p>@(item.ClaimMonth ?? "Not specified")</p>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <strong>Submission Date:</strong>
+                                                        <p>@item.SubmissionDate.ToString("dd MMM yyyy HH:mm")</p>
+                                                    </div>
+                                                </div>
+                                                @if (!string.IsNullOrEmpty(item.ReviewedBy))
+                                                {
+                                                    <div class="alert alert-info">
+                                                        <strong>Review Information:</strong>
+                                                        <p class="mb-1"><strong>Reviewed by:</strong> @item.ReviewedBy</p>
+                                                        <p class="mb-1"><strong>Review Date:</strong> @item.ReviewedDate?.ToString("dd MMM yyyy HH:mm")</p>
+                                                        @if (!string.IsNullOrEmpty(item.Comments))
+                                                        {
+                                                            <p class="mb-0"><strong>Comments:</strong> @item.Comments</p>
+                                                        }
+                                                    </div>
+                                                }
+                                                @if (!string.IsNullOrEmpty(item.UploadedFiles))
+                                                {
+                                                    <div class="mb-3">
+                                                        <strong>Supporting Documents:</strong>
+                                                        <p>
+                                                            <a href="~/uploads/@item.UploadedFiles" target="_blank" class="btn btn-sm btn-outline-primary">
+                                                                <i class="bi bi-file-earmark-text"></i> View Document
+                                                            </a>
+                                                        </p>
+                                                    </div>
+                                                }
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="text-center py-5">
+                    <i class="bi bi-inbox" style="font-size: 4rem; color: #ccc;"></i>
+                    <h4 class="mt-3">No claims available</h4>
+                    <p class="text-muted">Claims will appear here once lecturers submit them</p>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+}

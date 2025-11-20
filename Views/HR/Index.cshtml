@@ -1,0 +1,221 @@
+@model IEnumerable<CMCS.Models.Claim>
+
+@{
+    ViewData["Title"] = "HR Dashboard";
+}
+
+<div class="container-fluid mt-4">
+    <div class="row mb-4">
+        <div class="col">
+            <h2><i class="bi bi-people"></i> HR Dashboard</h2>
+            <p class="text-muted">Manage payments and lecturer information</p>
+        </div>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="bi bi-check-circle"></i> @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <!-- Statistics Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white shadow">
+                <div class="card-body">
+                    <h6 class="card-title">Total Claims</h6>
+                    <h2 class="display-5">@ViewBag.TotalClaims</h2>
+                    <small>All time</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white shadow">
+                <div class="card-body">
+                    <h6 class="card-title">Approved Claims</h6>
+                    <h2 class="display-5">@ViewBag.ApprovedClaims</h2>
+                    <small>Ready for payment</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-info text-white shadow">
+                <div class="card-body">
+                    <h6 class="card-title">Total Payable</h6>
+                    <h2 class="display-6">R @ViewBag.TotalPayable.ToString("N2")</h2>
+                    <small>Approved claims</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-white shadow">
+                <div class="card-body">
+                    <h6 class="card-title">Pending Payment</h6>
+                    <h2 class="display-5">@ViewBag.PendingPayment</h2>
+                    <small>Awaiting processing</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">Quick Actions</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <a asp-action="ApprovedClaims" class="btn btn-success w-100 py-3">
+                                <i class="bi bi-cash-coin" style="font-size: 2rem;"></i>
+                                <div class="mt-2">Process Payments</div>
+                            </a>
+                        </div>
+                        <div class="col-md-4">
+                            <a asp-action="GenerateReport" class="btn btn-primary w-100 py-3">
+                                <i class="bi bi-file-earmark-bar-graph" style="font-size: 2rem;"></i>
+                                <div class="mt-2">Generate Reports</div>
+                            </a>
+                        </div>
+                        <div class="col-md-4">
+                            <a asp-action="LecturerManagement" class="btn btn-info w-100 py-3">
+                                <i class="bi bi-person-lines-fill" style="font-size: 2rem;"></i>
+                                <div class="mt-2">Manage Lecturers</div>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="row g-3 mt-2">
+                        <div class="col-md-4">
+                            <a asp-action="MonthlyReport" class="btn btn-secondary w-100 py-3">
+                                <i class="bi bi-calendar3" style="font-size: 2rem;"></i>
+                                <div class="mt-2">Monthly Reports</div>
+                            </a>
+                        </div>
+                        <div class="col-md-4">
+                            <a asp-action="Statistics" class="btn btn-warning w-100 py-3">
+                                <i class="bi bi-graph-up-arrow" style="font-size: 2rem;"></i>
+                                <div class="mt-2">View Statistics</div>
+                            </a>
+                        </div>
+                        <div class="col-md-4">
+                            <a asp-action="ExportToCSV" class="btn btn-dark w-100 py-3">
+                                <i class="bi bi-download" style="font-size: 2rem;"></i>
+                                <div class="mt-2">Export Data</div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">System Overview</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="statusChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="card shadow">
+        <div class="card-header bg-light d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Recent Claims</h5>
+            <a asp-action="Index" asp-controller="Coordinator" class="btn btn-sm btn-outline-primary">
+                View All Claims
+            </a>
+        </div>
+        <div class="card-body">
+            @if (Model.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>ID</th>
+                                <th>Lecturer</th>
+                                <th>Total Amount</th>
+                                <th>Status</th>
+                                <th>Submitted</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.Take(10))
+                            {
+                                <tr>
+                                    <td>#@item.Id</td>
+                                    <td>@item.LecturerName</td>
+                                    <td><strong>R @item.TotalAmount.ToString("N2")</strong></td>
+                                    <td>
+                                        @if (item.Status == "Pending")
+                                        {
+                                            <span class="badge bg-warning text-dark">Pending</span>
+                                        }
+                                        else if (item.Status == "Approved")
+                                        {
+                                            <span class="badge bg-success">Approved</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-danger">Rejected</span>
+                                        }
+                                    </td>
+                                    <td>@item.SubmissionDate.ToString("dd MMM yyyy")</td>
+                                    <td>
+                                        @if (item.Status == "Approved")
+                                        {
+                                            <a asp-action="GenerateInvoice" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary">
+                                                <i class="bi bi-receipt"></i> Invoice
+                                            </a>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="text-center py-5">
+                    <i class="bi bi-inbox" style="font-size: 4rem; color: #ccc;"></i>
+                    <h4 class="mt-3">No claims in the system</h4>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Claims Status Chart
+        var ctx = document.getElementById('statusChart').getContext('2d');
+        var chart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Approved', 'Pending', 'Rejected'],
+                datasets: [{
+                    data: [@ViewBag.ApprovedClaims, @(ViewBag.TotalClaims - ViewBag.ApprovedClaims - (ViewBag.TotalClaims - ViewBag.PendingPayment)), @(ViewBag.TotalClaims - ViewBag.ApprovedClaims - ViewBag.PendingPayment)],
+                    backgroundColor: ['#28a745', '#ffc107', '#dc3545']
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+    </script>
+}

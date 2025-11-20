@@ -1,0 +1,23 @@
+@{
+    ViewData["Title"] = "Generate Report";
+}
+
+<h2>Generate HR Report</h2>
+
+<p>Select the type of report you want to generate.</p>
+
+<form method="post" asp-action="GenerateReport">
+    <div class="mb-3">
+        <label class="form-label">Report Type</label>
+        <select class="form-select" name="ReportType">
+            <option value="Monthly">Monthly Report</option>
+            <option value="Annual">Annual Report</option>
+            <option value="ApprovedClaims">Approved Claims Report</option>
+        </select>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Generate</button>
+</form>
+
+<hr>
+<p class="text-muted">Report output will appear here once implemented.</p>
